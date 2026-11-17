@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bakeryku By Tata - Artisanal Bakery & Boutique</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pistachio: '#93C572',
+                        sage: '#87A96B',
+                        sageDark: '#5F7A4C',
+                        cream: '#F4F9F0',
+                        creamDark: '#E8F3E0',
+                        gold: '#D4AF37'
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'Georgia', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;0,900;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js untuk Grafik Admin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #F4F9F0 0%, #E2EEDC 50%, #F9F6EE 100%);
+            background-attachment: fixed;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .hero-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 1.2s ease-in-out;
+            background-size: cover;
+            background-position: center;
+        }
+        .hero-slide.active {
+            opacity: 1;
+            animation: pulseSlide 10s infinite alternate;
+        }
+        @keyframes pulseSlide {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.08); }
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(135, 169, 107, 0.25);
+        }
+        .luxury-pattern {
+            background-image: radial-gradient(#87A96B 0.75px, transparent 0.75px), radial-gradient(#87A96B 0.75px, #F4F9F0 0.75px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+        }
+        @media print {
+            body * { visibility: hidden; }
+            #receiptPrintArea, #receiptPrintArea * { visibility: visible; }
+            #receiptPrintArea { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body class="text-gray-800 font-sans antialiased selection:bg-sage selection:text-white luxury-pattern min-h-screen">
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-[150] space-y-3 pointer-events-none"></div>
+
+    <!-- NAVBAR UTAMA -->
+    <header class="bg-white/95 backdrop-blur-md shadow-md sticky top-0 z-50 transition-all duration-300 border-b border-sage/20">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="showSection('home')">
+                <div class="bg-gradient-to-tr from-sageDark to-sage text-white p-2.5 rounded-full shadow-lg">
+                    <i class="fa-solid fa-cake-candles text-lg"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-extrabold tracking-wider text-sageDark block leading-none font-serif">Bakeryku By Tata</span>
+                    <span class="text-[10px] text-sage tracking-widest uppercase font-bold">Artisanal Bakery & Boutique</span>
+                </div>
+            </div>
+            
+            <nav class="hidden md:flex space-x-4 font-semibold text-gray-700 text-sm items-center">
+                <a href="#home" onclick="showSection('home')" class="hover:text-sage transition px-3 py-1.5 rounded-xl hover:bg-sage/10">Beranda</a>
+                <a href="#catalog" onclick="showSection('catalog')" class="hover:text-sage transition px-3 py-1.5 rounded-xl hover:bg-sage/10">Katalog Menu</a>
+                <a href="#custom" onclick="showSection('custom')" class="hover:text-sage transition px-3 py-1.5 rounded-xl hover:bg-sage/10">Studio Kustom</a>
+                <a href="#buyer-dashboard" onclick="showSection('buyer-dashboard')" class="hover:text-sage transition px-3 py-1.5 rounded-xl hover:bg-sage/10 text-sageDark font-bold"><i class="fa-solid fa-user-shield mr-1"></i> Dashboard Pembeli</a>
+                <a href="#testimonials" onclick="showSection('testimonials')" class="hover:text-sage transition px-3 py-1.5 rounded-xl hover:bg-sage/10">Testimoni</a>
+                <a href="#cashier" onclick="showSection('cashier')" class="hover:text-sageDark transition px-3 py-1.5 rounded-xl hover:bg-sage/10 text-sage"><i class="fa-solid fa-cash-register mr-1"></i> Kasir</a>
+                <a href="#admin" onclick="showSection('admin')" class="hover:text-sageDark transition px-3 py-1.5 rounded-xl hover:bg-sage/10 text-gray-700"><i class="fa-solid fa-lock mr-1 text-xs"></i> Admin</a>
+            </nav>
+
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleCart()" class="bg-gradient-to-r from-sage to-sageDark hover:from-sageDark hover:to-sage text-white px-5 py-2.5 rounded-full text-sm font-bold transition flex items-center space-x-2 shadow-lg transform hover:scale-105">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span>Keranjang</span>
+                    <span id="cartCount" class="bg-white text-sageDark text-xs px-2 py-0.5 rounded-full font-extrabold shadow">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="pb-16">
+
+        <!-- 1. BERANDA UTAMA -->
+        <section id="section-home" class="space-y-12">
+            <div class="relative min-h-[92vh] flex items-center justify-center overflow-hidden bg-gray-950 shadow-2xl rounded-b-[2.5rem]">
+                <div class="absolute inset-0 z-0">
+                    <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=1600&q=80')"></div>
+                    <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=1600&q=80')"></div>
+                    <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1535141192574-5d4897c13136?auto=format&fit=crop&w=1600&q=80')"></div>
+                    <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=1600&q=80')"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/20"></div>
+                </div>
+
+                <div class="container mx-auto px-6 relative z-10 py-24 text-white max-w-5xl">
+                    <div class="inline-flex items-center space-x-2 bg-gradient-to-r from-sageDark/90 to-sage/90 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 text-xs font-bold uppercase tracking-widest shadow-xl mb-6">
+                        <span class="w-2 h-2 rounded-full bg-gold animate-ping"></span>
+                        <span>✨ Pistachio & Sage Luxury Collection 2026</span>
+                    </div>
+                    
+                    <h1 class="text-5xl md:text-7xl lg:text-8xl font-black font-serif leading-[1.1] tracking-tight drop-shadow-2xl">
+                        Savor The Art of <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-pistachio via-cream to-amber-200 italic font-normal">Artisanal Bakery</span>
+                    </h1>
+                    
+                    <p class="text-base md:text-xl text-gray-200 mt-6 font-light max-w-2xl leading-relaxed drop-shadow">
+                        Selamat datang di <strong class="font-bold text-white">Bakeryku By Tata</strong>. Nikmati kelembutan pastry panggang segar harian, kue kustom ulang tahun eksklusif, serta paket hemat makanan & minuman segar.
+                    </p>
+
+                    <!-- JAM OPERASIONAL -->
+                    <div class="inline-flex items-center space-x-3 bg-white/10 backdrop-blur-md px-5 py-3 rounded-2xl border border-white/20 mt-6 text-sm shadow-xl">
+                        <div class="w-9 h-9 bg-sage text-white rounded-xl flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div>
+                            <p class="text-[11px] text-gray-300 uppercase tracking-widest font-bold">Jam Operasional Toko</p>
+                            <p class="text-xs font-extrabold text-amber-300">Buka Setiap Hari: 08.00 - 21.00 WIB</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 my-8 max-w-lg border-y border-white/20 py-4 text-center">
+                        <div>
+                            <span class="text-2xl font-black text-amber-300 font-serif block">100%</span>
+                            <span class="text-[11px] text-gray-300 font-medium uppercase tracking-wider">Fresh Daily</span>
+                        </div>
+                        <div class="border-x border-white/20">
+                            <span class="text-2xl font-black text-amber-300 font-serif block">4.9 ★</span>
+                            <span class="text-[11px] text-gray-300 font-medium uppercase tracking-wider">Customer Rating</span>
+                        </div>
+                        <div>
+                            <span class="text-2xl font-black text-amber-300 font-serif block">20+</span>
+                            <span class="text-[11px] text-gray-300 font-medium uppercase tracking-wider">Pilihan Menu</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="showSection('catalog')" class="bg-gradient-to-r from-sage to-sageDark hover:from-sageDark hover:to-sage text-white font-bold px-8 py-4 rounded-full shadow-2xl transition transform hover:-translate-y-1 flex items-center space-x-3 text-base border border-white/30">
+                            <span>Jelajahi Katalog & Paket Promo</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                        <button onclick="showSection('custom')" class="bg-white/20 hover:bg-white/35 backdrop-blur-md text-white border-2 border-white/60 font-bold px-8 py-4 rounded-full transition text-base shadow-xl flex items-center space-x-2">
+                            <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+                            <span>Desain Kue Kustom (Min. H-7)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container mx-auto px-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-card p-6 rounded-3xl shadow-xl flex items-center space-x-4 border border-sage/30 hover:shadow-2xl transition">
+                        <div class="w-14 h-14 bg-sage/20 text-sageDark rounded-2xl flex items-center justify-center text-2xl font-bold shrink-0">
+                            <i class="fa-solid fa-wheat-awn"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-extrabold text-sageDark text-base font-serif">Artisanal Handcrafted</h4>
+                            <p class="text-xs text-gray-600 mt-0.5">Dibuat dari mentega Prancis dan bahan premium tanpa pengawet.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-3xl shadow-xl flex items-center space-x-4 border border-sage/30 hover:shadow-2xl transition">
+                        <div class="w-14 h-14 bg-rose-500/15 text-rose-600 rounded-2xl flex items-center justify-center text-2xl font-bold shrink-0">
+                            <i class="fa-solid fa-box-open"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-extrabold text-sageDark text-base font-serif">Paket Bundling Hemat</h4>
+                            <p class="text-xs text-gray-600 mt-0.5">Paduan roti + minuman kekinian dengan potongan harga khusus.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-3xl shadow-xl flex items-center space-x-4 border border-sage/30 hover:shadow-2xl transition">
+                        <div class="w-14 h-14 bg-amber-500/15 text-amber-600 rounded-2xl flex items-center justify-center text-2xl font-bold shrink-0">
+                            <i class="fa-solid fa-truck-fast"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-extrabold text-sageDark text-base font-serif">Lacak Pengiriman Transparan</h4>
+                            <p class="text-xs text-gray-600 mt-0.5">Cek riwayat pembelian dan status pesanan langsung di Dashboard Pembeli.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. KATALOG MENU -->
+        <section id="section-catalog" class="hidden container mx-auto px-6 py-12 space-y-8">
+            <div class="glass-card p-8 rounded-3xl shadow-xl space-y-6 border border-sage/30">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <span class="bg-sage/20 text-sageDark text-xs font-extrabold px-3 py-1 rounded-full uppercase">Butik Katalog Mewah</span>
+                        <h2 class="text-3xl font-black text-sageDark mt-2 font-serif">Katalog Menu & Paket Hemat</h2>
+                        <p class="text-sm text-gray-600 mt-1">Dilengkapi info Tanggal Produksi, Masa Kedaluwarsa (Exp), Diskon, dan Paket Bundling.</p>
+                    </div>
+                    <div class="relative w-full md:w-72">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="catalogSearch" oninput="renderCatalog(currentCategoryFilter)" placeholder="Cari menu / pastry..." class="w-full pl-11 pr-4 py-2.5 rounded-full border border-sage/30 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-sage shadow-sm">
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap justify-between items-center gap-4 border-t border-sage/20 pt-4">
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="filterCatalog('all')" class="px-4 py-2 bg-sage text-white rounded-full text-xs font-bold filter-btn shadow transition">Semua Menu</button>
+                        <button onclick="filterCatalog('paket')" class="px-4 py-2 bg-rose-500 text-white rounded-full text-xs font-bold filter-btn shadow transition"><i class="fa-solid fa-box-open mr-1"></i> Paket Bundling</button>
+                        <button onclick="filterCatalog('bestseller')" class="px-4 py-2 bg-amber-500 text-white rounded-full text-xs font-bold filter-btn shadow transition"><i class="fa-solid fa-fire mr-1"></i> Best Seller</button>
+                        <button onclick="filterCatalog('diskon')" class="px-4 py-2 bg-purple-600 text-white rounded-full text-xs font-bold filter-btn shadow transition"><i class="fa-solid fa-tags mr-1"></i> Promo Diskon</button>
+                        <button onclick="filterCatalog('roti')" class="px-4 py-2 bg-white text-gray-700 rounded-full text-xs font-bold border hover:bg-sage/10 filter-btn transition">Roti</button>
+                        <button onclick="filterCatalog('kue')" class="px-4 py-2 bg-white text-gray-700 rounded-full text-xs font-bold border hover:bg-sage/10 filter-btn transition">Kue</button>
+                        <button onclick="filterCatalog('minuman')" class="px-4 py-2 bg-white text-gray-700 rounded-full text-xs font-bold border hover:bg-sage/10 filter-btn transition">Minuman</button>
+                    </div>
+
+                    <div class="flex items-center space-x-2 text-xs font-bold text-gray-700">
+                        <i class="fa-solid fa-filter text-sage"></i>
+                        <span>Harga:</span>
+                        <select id="priceFilter" onchange="renderCatalog(currentCategoryFilter)" class="border rounded-xl px-3 py-1.5 bg-white shadow-sm focus:outline-none">
+                            <option value="all">Semua Harga</option>
+                            <option value="under50">Di Bawah Rp 50.000</option>
+                            <option value="50to150">Rp 50.000 - Rp 150.000</option>
+                            <option value="above150">Di Atas Rp 150.000</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="catalogGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+        </section>
+
+        <!-- 3. STUDIO KUSTOM KUE -->
+        <section id="section-custom" class="hidden container mx-auto px-6 py-12 space-y-8">
+            <div class="text-center max-w-2xl mx-auto">
+                <span class="text-sage text-xs font-bold uppercase tracking-widest bg-sage/20 px-4 py-1.5 rounded-full border border-sage/30 shadow-sm">Interactive Cake Designer</span>
+                <h2 class="text-3xl md:text-4xl font-black text-sageDark mt-3 font-serif">Studio Kustom Kue Eksklusif</h2>
+                <p class="text-gray-600 text-sm mt-2">Rancang sendiri desain kue impian Anda. Pemesanan wajib minimal H-7.</p>
+                <div class="mt-4 bg-amber-50 border border-amber-300 text-amber-800 px-4 py-2 rounded-xl text-xs font-bold inline-block shadow-sm">
+                    ⚠️ Status Pemesanan Online: Semua pesanan online otomatis berstatus <strong>"Sedang Di Proses"</strong> karena barang belum sampai ke tangan pelanggan.
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 glass-card p-8 rounded-3xl shadow-xl border border-sage/30">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Gaya / Model Desain Dasar</label>
+                        <select id="customStyleImg" onchange="updateCustomCake()" class="w-full border rounded-xl p-2.5 bg-white font-medium shadow-sm text-xs">
+                            <option value="https://images.unsplash.com/photo-1535141192574-5d4897c13136?auto=format&fit=crop&w=600&q=80">Minimalist Sage Green Crown Cake</option>
+                            <option value="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=600&q=80">Rich Chocolate Ganache Layer Cake</option>
+                            <option value="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=600&q=80">Strawberry Fresh Cream Tart</option>
+                            <option value="https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?auto=format&fit=crop&w=600&q=80">Floral Vintage Aesthetic Cake</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Ukuran Kue</label>
+                        <select id="customSize" onchange="updateCustomCake()" class="w-full border rounded-xl p-2.5 bg-white font-medium shadow-sm text-xs">
+                            <option value="150000" data-name="Kecil (15cm) - Rp 150.000">Kecil (15cm) - Rp 150.000</option>
+                            <option value="250000" data-name="Sedang (20cm) - Rp 250.000">Sedang (20cm) - Rp 250.000</option>
+                            <option value="400000" data-name="Besar (25cm) - Rp 400.000">Besar (25cm) - Rp 400.000</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Rasa Sponge</label>
+                        <select id="customFlavor" onchange="updateCustomCake()" class="w-full border rounded-xl p-2.5 bg-white font-medium shadow-sm text-xs">
+                            <option value="0" data-name="Vanila Klasik">Vanila Klasik</option>
+                            <option value="25000" data-name="Cokelat Rich (+Rp 25.000)">Cokelat Rich (+Rp 25.000)</option>
+                            <option value="35000" data-name="Pistachio Bronte Cream (+Rp 35.000)">Pistachio Bronte Cream (+Rp 35.000)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Warna Aksen Krim</label>
+                        <select id="customColor" onchange="updateCustomCake()" class="w-full border rounded-xl p-2.5 bg-white font-medium shadow-sm text-xs">
+                            <option value="#87A96B" data-name="Sage Green">Sage Green</option>
+                            <option value="#93C572" data-name="Pistachio">Pistachio</option>
+                            <option value="#F472B6" data-name="Soft Pink">Soft Pink</option>
+                            <option value="#FBBF24" data-name="Cream Butter">Cream Butter</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Tgl Acara / Ambil * (Min. H-7)</label>
+                            <input type="date" id="customEventDate" class="w-full border rounded-xl p-2 bg-white font-medium shadow-sm text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Tulisan pada Kue</label>
+                            <input type="text" id="customNote" placeholder="Happy Birthday Tata" class="w-full border rounded-xl p-2 bg-white font-medium shadow-sm text-xs">
+                        </div>
+                    </div>
+
+                    <!-- PENGATURAN PEMBAYARAN KUSTOM KUE -->
+                    <div class="p-4 bg-cream rounded-2xl border border-sage/30 space-y-3 text-xs">
+                        <p class="font-extrabold text-sageDark uppercase tracking-wider"><i class="fa-solid fa-wallet mr-1"></i> Opsi Pembayaran Online:</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">Metode Bayar:</label>
+                                <select id="customPayMethod" class="w-full border rounded-xl p-2 bg-white font-semibold">
+                                    <option value="Debit / QRIS / Transfer">Debit / QRIS / Transfer</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">Skema Bayar:</label>
+                                <select id="customPayType" onchange="updateCustomCake()" class="w-full border rounded-xl p-2 bg-white font-semibold">
+                                    <option value="dp">Bayar DP (50%)</option>
+                                    <option value="full">Lunas Sekaligus (100%)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="statusInfoBox" class="p-2.5 rounded-xl bg-amber-100 text-amber-900 text-[11px] font-bold border border-amber-300">
+                            Status Pesanan: <span class="underline">Sedang Di Proses</span>
+                        </div>
+                    </div>
+
+                    <button onclick="addCustomToCart()" class="w-full bg-gradient-to-r from-sage to-sageDark hover:from-sageDark hover:to-sage text-white font-bold py-3.5 rounded-xl transition shadow-lg transform hover:scale-[1.01]">Masukkan Kustom ke Keranjang</button>
+                </div>
+                
+                <div class="flex flex-col items-center justify-center bg-white/60 rounded-3xl p-6 border-2 border-dashed border-sage/50 relative shadow-inner">
+                    <h4 class="text-sm font-extrabold text-sageDark mb-4 uppercase tracking-wider">Pratinjau Visual Kustom Kue Anda</h4>
+                    <div id="cakePreviewBox" class="w-64 h-64 rounded-3xl flex flex-col items-center justify-center relative shadow-2xl overflow-hidden border-4 border-white">
+                        <img id="previewImgTag" src="https://images.unsplash.com/photo-1535141192574-5d4897c13136?auto=format&fit=crop&w=600&q=80" alt="Preview" class="absolute inset-0 w-full h-full object-cover">
+                        <div id="cakeColorOverlay" class="absolute inset-0 mix-blend-color opacity-30 transition-all duration-300" style="background-color: #87A96B;"></div>
+                        <div class="absolute bottom-4 bg-black/75 backdrop-blur-md px-3 py-1.5 rounded-xl max-w-[85%] text-center shadow-lg border border-white/20">
+                            <span id="previewTextTag" class="text-[11px] font-bold text-white tracking-widest truncate block">Happy Birthday Tata</span>
+                        </div>
+                    </div>
+                    <p id="previewPrice" class="mt-4 text-xl font-black text-sageDark font-serif">Total Harga: Rp 150.000</p>
+                    <p id="previewPayNotice" class="text-xs text-rose-600 font-bold mt-1">Estimasi Tagihan DP (50%): Rp 75.000</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. DASHBOARD PEMBELI -->
+        <section id="section-buyer-dashboard" class="hidden container mx-auto px-6 py-12 space-y-8">
+            <div class="glass-card p-8 md:p-10 rounded-3xl shadow-2xl border border-sage/30 space-y-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-sage/20 pb-6 gap-4">
+                    <div>
+                        <span class="bg-sage/20 text-sageDark text-xs font-extrabold px-3.5 py-1.5 rounded-full uppercase border border-sage/30">Customer Portal Luxury</span>
+                        <h2 class="text-3xl font-black text-sageDark mt-2 font-serif">Dashboard Pembeli & Riwayat Pesanan</h2>
+                        <p class="text-sm text-gray-600 mt-1">Pantau status pesanan dan rincian transaksi online Anda.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <input type="text" id="buyerSearchInput" oninput="updateBuyerDashboard()" placeholder="Cari No. TRX / Nama..." class="px-4 py-2 border rounded-full text-xs bg-white focus:outline-none focus:ring-2 focus:ring-sage shadow-sm">
+                        <div class="bg-white p-3 rounded-2xl border border-sage/30 flex items-center space-x-3 shadow-sm">
+                            <div class="w-10 h-10 bg-gradient-to-tr from-sage to-sageDark text-white rounded-full flex items-center justify-center font-bold shadow"><i class="fa-solid fa-user text-sm"></i></div>
+                            <div>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Status Akun</p>
+                                <p class="text-xs font-black text-sageDark">VIP Sage Member ⭐</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="p-6 bg-white rounded-2xl border border-sage/20 flex justify-between items-center shadow-sm">
+                        <div>
+                            <span class="text-xs text-gray-500 font-bold uppercase">Total Transaksi Anda</span>
+                            <span id="buyerTotalOrders" class="text-3xl font-black text-sageDark mt-1 block font-serif">0</span>
+                        </div>
+                        <div class="w-12 h-12 bg-sage/15 text-sageDark rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-bag-shopping"></i></div>
+                    </div>
+                    <div class="p-6 bg-white rounded-2xl border border-sage/20 flex justify-between items-center shadow-sm">
+                        <div>
+                            <span class="text-xs text-gray-500 font-bold uppercase">Total Belanja Berhasil</span>
+                            <span id="buyerTotalSpent" class="text-xl font-black text-sageDark mt-2 block font-serif">Rp 0</span>
+                        </div>
+                        <div class="w-12 h-12 bg-sage/15 text-sageDark rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-wallet"></i></div>
+                    </div>
+                    <div class="p-6 bg-white rounded-2xl border border-sage/20 flex justify-between items-center shadow-sm">
+                        <div>
+                            <span class="text-xs text-gray-500 font-bold uppercase">Status Loyalitas</span>
+                            <span class="text-sm font-black text-emerald-600 mt-2 block">Exclusive Access 🚀</span>
+                        </div>
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-crown"></i></div>
+                    </div>
+                </div>
+
+                <div class="space-y-4 pt-4">
+                    <h3 class="text-xl font-black text-sageDark font-serif"><i class="fa-solid fa-receipt text-sage mr-2"></i> List Riwayat Pesanan & Status Pembayaran</h3>
+                    <div id="buyerOrdersList" class="space-y-4 max-h-[450px] overflow-y-auto pr-2">
+                        <p class="text-gray-500 text-sm italic">Belum ada riwayat pembelian tercatat di browser ini.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. TESTIMONI -->
+        <section id="section-testimonials" class="hidden container mx-auto px-6 py-12 space-y-8">
+            <div class="text-center max-w-xl mx-auto">
+                <span class="bg-sage/20 text-sageDark text-xs font-bold px-3.5 py-1.5 rounded-full uppercase">Review Pelanggan</span>
+                <h2 class="text-3xl font-black text-sageDark mt-2 font-serif">Testimoni Pelanggan Setia</h2>
+            </div>
+            <div id="testimonialList" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </section>
+
+        <!-- 6. MODE KASIR (POS) -->
+        <section id="section-cashier" class="hidden container mx-auto px-6 py-12 space-y-8">
+            <div class="flex justify-between items-center glass-card p-6 rounded-3xl shadow-xl border border-sage/30">
+                <div>
+                    <span class="bg-sage/20 text-sageDark text-xs font-extrabold px-3 py-1 rounded-full uppercase">Point of Sales</span>
+                    <h2 class="text-2xl font-black text-sageDark mt-1 font-serif"><i class="fa-solid fa-cash-register mr-2"></i> POS Kasir BAKERYKU</h2>
+                </div>
+                <div class="text-xs font-bold bg-sage text-white px-4 py-2 rounded-xl shadow">Kasir Aktif: Visha</div>
+            </div>
+
+            <!-- Studio Kustom Kasir -->
+            <div class="glass-card p-6 rounded-3xl shadow-xl border border-sage/30 space-y-4">
+                <h3 class="font-bold text-sageDark text-base font-serif"><i class="fa-solid fa-wand-magic-sparkles mr-2 text-sage"></i> Studio Edit Kustom Kue (Kasir - Min. H-7)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Model Kue</label>
+                        <select id="posCustomStyle" class="w-full border rounded-xl p-2.5 text-sm bg-white shadow-sm">
+                            <option value="Minimalist Sage Green Crown Cake">Minimalist Sage Green Crown Cake</option>
+                            <option value="Rich Chocolate Ganache Layer Cake">Rich Chocolate Ganache Layer Cake</option>
+                            <option value="Strawberry Fresh Cream Tart">Strawberry Fresh Cream Tart</option>
+                            <option value="Floral Vintage Aesthetic Cake">Floral Vintage Aesthetic Cake</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Ukuran & Harga</label>
+                        <select id="posCustomSize" class="w-full border rounded-xl p-2.5 text-sm bg-white shadow-sm">
+                            <option value="150000" data-name="Kecil (15cm) - Rp 150.000">Kecil (15cm) - Rp 150.000</option>
+                            <option value="250000" data-name="Sedang (20cm) - Rp 250.000">Sedang (20cm) - Rp 250.000</option>
+                            <option value="400000" data-name="Besar (25cm) - Rp 400.000">Besar (25cm) - Rp 400.000</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Rasa Sponge</label>
+                        <select id="posCustomFlavor" class="w-full border rounded-xl p-2.5 text-sm bg-white shadow-sm">
+                            <option value="0" data-name="Vanila Klasik">Vanila Klasik</option>
+                            <option value="25000" data-name="Cokelat Rich (+Rp 25.000)">Cokelat Rich (+Rp 25.000)</option>
+                            <option value="35000" data-name="Pistachio Bronte (+Rp 35.000)">Pistachio Bronte (+Rp 35.000)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Tanggal Ambil (Min. H-7)</label>
+                        <input type="date" id="posCustomDate" class="w-full border rounded-xl p-2 text-xs bg-white shadow-sm">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Metode Bayar Kasir</label>
+                        <select id="posCustomMethod" class="w-full border rounded-xl p-2 text-xs bg-white shadow-sm font-semibold">
+                            <option value="Cash / Tunai">Cash / Tunai</option>
+                            <option value="Debit / QRIS / Transfer">Debit / QRIS / Transfer</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Skema Bayar Kasir</label>
+                        <select id="posCustomPayType" class="w-full border rounded-xl p-2 text-xs bg-white shadow-sm font-semibold">
+                            <option value="dp">DP (50%)</option>
+                            <option value="full">Lunas (100%)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Catatan/Tulisan Kue</label>
+                        <input type="text" id="posCustomNote" placeholder="Misal: Happy Birthday Visha" class="w-full border rounded-xl p-2 text-xs bg-white shadow-sm">
+                    </div>
+                </div>
+                <button onclick="addPOSCustomCakeToCart()" class="bg-sageDark hover:bg-sage text-white font-bold px-6 py-2.5 rounded-xl text-sm transition shadow">
+                    <i class="fa-solid fa-plus mr-1"></i> Masukkan Kustom Kue ke Kasir
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="md:col-span-2 glass-card p-6 rounded-3xl shadow-xl border border-sage/30 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-gray-800 text-lg">Pilih Menu Kasir</h3>
+                        <input type="text" id="posSearch" oninput="renderPOSProducts()" placeholder="Cari menu..." class="border rounded-xl px-4 py-2 text-sm bg-white outline-none shadow-sm">
+                    </div>
+                    <div id="posProductGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[420px] overflow-y-auto pr-1"></div>
+                </div>
+
+                <!-- Keranjang Kasir -->
+                <div class="glass-card p-6 rounded-3xl shadow-xl border border-sage/30 space-y-4 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <h3 class="font-bold text-gray-800 text-lg border-b pb-3 border-sage/20">Keranjang Kasir</h3>
+                        <div id="posCartItems" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                            <p class="text-gray-400 text-sm">Belum ada item dipilih.</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 border-t pt-4 border-sage/20">
+                        <div class="flex justify-between text-sm text-gray-600">
+                            <span>Subtotal</span>
+                            <span id="posSubtotal" class="font-semibold">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-600">
+                            <span>Pajak (10%)</span>
+                            <span id="posTax" class="font-semibold">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between text-lg font-black border-t pt-2 text-sageDark border-sage/20">
+                            <span>Total Tagihan Kasir</span>
+                            <span id="posTotal">Rp 0</span>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Pembeli</label>
+                            <input type="text" id="posBuyerName" placeholder="Contoh: Kak Budi" class="w-full border rounded-xl p-2.5 text-sm bg-white shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Metode Pembayaran Kasir</label>
+                            <select id="posPaymentMethod" onchange="toggleCashInput()" class="w-full border rounded-xl p-2.5 text-sm bg-white font-medium shadow-sm">
+                                <option value="Tunai (Cash)">Tunai (Cash)</option>
+                                <option value="Debit / QRIS / Transfer">Debit / QRIS / Transfer</option>
+                            </select>
+                        </div>
+
+                        <!-- INPUT MANUAL CASH -->
+                        <div id="cashInputBox" class="p-3 bg-cream rounded-xl border border-sage/30 space-y-2">
+                            <label class="block text-xs font-bold text-gray-700">Nominal Uang Tunai Diterima (Rp)</label>
+                            <input type="number" id="posCashReceived" oninput="calculateChange()" placeholder="Ketik manual nominal..." class="w-full border rounded-lg p-2 text-xs bg-white font-bold">
+                            
+                            <div class="flex gap-1.5 pt-1">
+                                <button onclick="setQuickCash(0)" class="bg-white border text-[10px] px-2 py-1 rounded font-bold hover:bg-sage/10">Uang Pas</button>
+                                <button onclick="setQuickCash(50000)" class="bg-white border text-[10px] px-2 py-1 rounded font-bold hover:bg-sage/10">50rb</button>
+                                <button onclick="setQuickCash(100000)" class="bg-white border text-[10px] px-2 py-1 rounded font-bold hover:bg-sage/10">100rb</button>
+                                <button onclick="setQuickCash(200000)" class="bg-white border text-[10px] px-2 py-1 rounded font-bold hover:bg-sage/10">200rb</button>
+                            </div>
+
+                            <div class="flex justify-between text-xs font-black text-sageDark border-t pt-1.5 border-sage/20">
+                                <span>Kembalian:</span>
+                                <span id="posChangeText">Rp 0</span>
+                            </div>
+                        </div>
+
+                        <button onclick="finishCashierTransaction()" id="posCheckoutBtn" class="w-full bg-sage hover:bg-sageDark text-white font-bold py-3 rounded-xl transition shadow-md disabled:opacity-50" disabled>Proses Pembayaran & Cetak Nota</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List Rekap Kasir -->
+            <div class="glass-card p-6 rounded-3xl shadow-xl border border-sage/30 space-y-4">
+                <h3 class="font-bold text-gray-800 text-base font-serif"><i class="fa-solid fa-list-check text-sage mr-2"></i> List Pembeli / Rekap Kasir Hari Ini</h3>
+                <div id="cashierTransactionsList" class="space-y-2.5 max-h-48 overflow-y-auto pr-1">
+                    <p class="text-gray-400 text-sm">Belum ada transaksi tercatat di kasir.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. MODE ADMIN -->
+        <section id="section-admin" class="hidden container mx-auto px-6 py-12 space-y-8">
+            <div id="adminLoginBox" class="max-w-md mx-auto glass-card p-8 rounded-3xl shadow-2xl border border-sage/30 space-y-6">
+                <div class="text-center">
+                    <div class="w-14 h-14 bg-sage/20 text-sageDark rounded-2xl mx-auto flex items-center justify-center text-2xl font-bold mb-3 shadow-inner">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-sageDark font-serif">Login Mode Admin</h2>
+                    <p class="text-xs text-gray-500 mt-1">Username: anggieta navisha | Password: 050609</p>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Username Admin</label>
+                        <input type="text" id="adminUser" placeholder="anggieta navisha" class="w-full border rounded-xl p-3 bg-white text-sm shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Password</label>
+                        <input type="password" id="adminPass" placeholder="050609" class="w-full border rounded-xl p-3 bg-white text-sm shadow-sm">
+                    </div>
+                    <button onclick="loginAdmin()" class="w-full bg-sage hover:bg-sageDark text-white font-bold py-3.5 rounded-xl transition shadow-lg">Masuk Panel Admin</button>
+                </div>
+            </div>
+
+            <div id="adminPanel" class="hidden space-y-8">
+                <div class="flex justify-between items-center glass-card p-6 rounded-3xl shadow-xl border border-sage/30">
+                    <div>
+                        <span class="bg-sage/20 text-sageDark text-xs font-extrabold px-3 py-1 rounded-full uppercase">Control Center</span>
+                        <h2 class="text-2xl font-black text-sageDark mt-1 font-serif">Panel Kontrol Admin (Anggieta Navisha)</h2>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="exportSalesToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-sm flex items-center space-x-1.5"><i class="fa-solid fa-file-excel"></i> <span>Export Excel (.CSV)</span></button>
+                        <button onclick="logoutAdmin()" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-xl font-bold text-sm shadow-sm">Keluar Admin</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Ringkasan Statistik -->
+                    <div class="glass-card p-6 rounded-3xl shadow-xl border border-sage/30 space-y-4 md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-5 bg-white rounded-2xl flex justify-between items-center border border-sage/20 shadow-sm">
+                            <div>
+                                <span class="text-gray-500 text-xs uppercase font-bold">Total Transaksi</span>
+                                <span id="statTotalTrans" class="font-black text-sageDark text-3xl mt-1 block font-serif">0</span>
+                            </div>
+                            <div class="w-12 h-12 bg-sage/20 text-sageDark rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-receipt"></i></div>
+                        </div>
+                        <div class="p-5 bg-white rounded-2xl flex justify-between items-center border border-sage/20 shadow-sm">
+                            <div>
+                                <span class="text-gray-500 text-xs uppercase font-bold">Total Produk & Paket</span>
+                                <span id="statTotalProd" class="font-black text-sageDark text-3xl mt-1 block font-serif">0</span>
+                            </div>
+                            <div class="w-12 h-12 bg-sage/20 text-sageDark rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-boxes-stacked"></i></div>
+                        </div>
+                        <div class="p-5 bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-2xl flex justify-between items-center shadow-md">
+                            <div>
+                                <span class="text-amber-100 text-xs uppercase font-bold block">🔥 Menu Paling Menguntungkan</span>
+                                <span id="statBestProduct" class="font-extrabold text-sm mt-1 block font-serif truncate max-w-[200px]">Belum ada data</span>
+                            </div>
+                            <div class="w-12 h-12 bg-white/20 text-white rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-crown"></i></div>
+                        </div>
+                    </div>
+
+                    <!-- 📊 GRAFIK 1: GRAFIK PENJUALAN & PRODUK PALING MENGUNTUNGKAN -->
+                    <div class="glass-card p-6 rounded-3xl shadow-xl border border-sage/30 space-y-4 md:col-span-3">
+                        <div class="flex justify-between items-center border-b pb-3 border-sage/20">
+                            <h3 class="text-lg font-extrabold text-gray-800"><i class="fa-solid fa-chart-line text-sage mr-2"></i> Grafik Omset & Produk Paling Menguntungkan</h3>
+                            <span class="text-xs bg-sage/20 text-sageDark font-bold px-3 py-1 rounded-full">Analisis Profitabilitas</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white p-4 rounded-2xl border border-sage/20 shadow-sm">
+                                <p class="text-xs font-bold text-gray-600 mb-2 text-center uppercase tracking-wider">Omset Penjualan Bulanan (Rp)</p>
+                                <div class="w-full h-64">
+                                    <canvas id="salesChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="bg-white p-4 rounded-2xl border border-sage/20 shadow-sm">
+                                <p class="text-xs font-bold text-gray-600 mb-2 text-center uppercase tracking-wider">Perbandingan Keuntungan Produk (Top Revenue)</p>
+                                <div class="w-full h-64">
+                                    <canvas id="profitChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 📦 GRAFIK 2: GRAFIK STOK PRODUK -->
+                    <div class="glass-card p-6 rounded-3xl shadow-xl border border-sage/30 space-y-4 md:col-span-3">
+                        <div class="flex justify-between items-center border-b pb-3 border-sage/20">
+                            <h3 class="text-lg font-extrabold text-gray-800"><i class="fa-solid fa-boxes-stacked text-amber-600 mr-2"></i> Grafik Ketersediaan Stok Produk</h3>
+                            <span class="text-xs bg-amber-100 text-amber-800 font-bold px-3 py-1 rounded-full">Monitoring Gudang</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-sage/20 shadow-sm">
+                            <div class="w-full h-72">
+                                <canvas id="stockChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAMBAH / EDIT PRODUK -->
+                    <div class="glass-card p-6 rounded-3xl shadow-xl border border-sage/30 space-y-4 md:col-span-1">
+                        <h3 id="formTitle" class="text-lg font-extrabold text-gray-800">Tambah Menu & Tanggal Exp Baru</h3>
+                        <input type="hidden" id="editId" value="">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Menu / Paket</label>
+                            <input type="text" id="prodName" placeholder="Contoh: Paket Sage Morning" class="w-full border rounded-xl p-2.5 text-sm bg-white shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Kategori</label>
+                            <select id="prodCategory" class="w-full border rounded-xl p-2.5 text-sm bg-white shadow-sm">
+                                <option value="paket">📦 Paket Bundling (Makanan + Minuman)</option>
+                                <option value="roti">Roti & Pastry</option>
+                                <option value="kue">Kue Ulang Tahun / Potong</option>
+                                <option value="minuman">Minuman / Beverages</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Tag Khusus</label>
+                            <select id="prodTag" class="w-full border rounded-xl p-2.5 text-sm bg-white shadow-sm">
+                                <option value="normal">Normal</option>
+                                <option value="bestseller">🔥 Best Seller</option>
+                                <option value="recommended">⭐ Rekomendasi Chef</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">Tgl Produksi</label>
+                                <input type="text" id="prodMfg" placeholder="2026-10-05" class="w-full border rounded-xl p-2.5 text-sm bg-white shadow-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">Tgl Exp (YYYY-MM-DD)</label>
+                                <input type="text" id="prodExp" placeholder="2026-11-20" class="w-full border rounded-xl p-2.5 text-sm bg-white shadow-sm">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Harga Normal (Rp)</label>
+                            <input type="number" id="prodPrice" placeholder="50000" class="w-full border rounded-xl p-2.5 text-sm bg-white shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Harga Diskon (Rp) - Opsional</label>
+                            <input type="number" id="prodDiscountPrice" placeholder="Kosongkan jika tidak diskon" class="w-full border rounded-xl p-2.5 text-sm bg-white shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Jumlah Stok</label>
+                            <input type="number" id="prodStock" value="20" class="w-full border rounded-xl p-2.5 text-sm bg-white shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">URL Gambar (Estetik)</label>
+                            <input type="text" id="prodImage" placeholder="https://..." class="w-full border rounded-xl p-2.5 text-sm bg-white shadow-sm">
+                        </div>
+                        <button onclick="saveProduct()" class="w-full bg-sage hover:bg-sageDark text-white font-bold py-3 rounded-xl transition shadow text-sm">Simpan Produk</button>
+                    </div>
+
+                    <!-- MANAJEMEN STOK -->
+                    <div class="glass-card p-6 rounded-3xl shadow-xl border border-sage/30 space-y-4 md:col-span-2">
+                        <h3 class="text-lg font-extrabold text-gray-800">Manajemen Stok, Produksi & Exp Date</h3>
+                        <div id="adminProductList" class="space-y-2.5 max-h-80 overflow-y-auto pr-1"></div>
+                    </div>
+
+                    <!-- REKAP TRANSAKSI -->
+                    <div class="glass-card p-6 rounded-3xl shadow-xl border border-sage/30 space-y-4 md:col-span-3">
+                        <h3 class="text-lg font-extrabold text-gray-800">List Pembeli & Rekap Transaksi</h3>
+                        <div id="adminOrdersList" class="space-y-3 max-h-60 overflow-y-auto pr-1">
+                            <p class="text-gray-500 text-sm">Memuat data...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- DRAWER KERANJANG ONLINE -->
+    <div id="cartDrawer" class="fixed inset-0 bg-black/60 z-50 hidden flex justify-end backdrop-blur-sm">
+        <div class="bg-white w-full max-w-md h-full p-6 flex flex-col justify-between shadow-2xl">
+            <div class="space-y-4">
+                <div class="flex justify-between items-center border-b pb-4">
+                    <h3 class="text-xl font-extrabold text-sageDark font-serif">Keranjang Belanja Online</h3>
+                    <button onclick="toggleCart()" class="text-gray-400 hover:text-gray-700 text-xl"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div id="cartItemsList" class="space-y-3 max-h-[50vh] overflow-y-auto pr-1">
+                    <p class="text-gray-400 text-sm">Keranjang Anda masih kosong.</p>
+                </div>
+                <div class="bg-cream p-3 rounded-xl border border-sage/30 space-y-2">
+                    <label class="block text-xs font-bold text-gray-700">Kode Voucher / Promo</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="promoCodeInput" placeholder="Contoh: TATA10" class="uppercase border rounded-lg px-3 py-1.5 text-xs bg-white flex-grow font-semibold">
+                        <button onclick="applyPromoCode()" class="bg-sage hover:bg-sageDark text-white px-3 py-1.5 rounded-lg text-xs font-bold transition">Pakai</button>
+                    </div>
+                    <p id="promoMessage" class="text-[10px] text-gray-500 italic">Gunakan kode <span class="font-bold text-sageDark">TATA10</span> untuk potongan 10%.</p>
+                </div>
+            </div>
+            <div class="space-y-3 border-t pt-4">
+                <div class="flex justify-between text-sm text-gray-600">
+                    <span>Subtotal</span>
+                    <span id="cartSubtotal" class="font-semibold">Rp 0</span>
+                </div>
+                <div id="cartDiscountRow" class="flex justify-between text-sm text-emerald-600 font-semibold hidden">
+                    <span>Diskon Kupon</span>
+                    <span id="cartDiscount">Rp 0</span>
+                </div>
+                <div class="flex justify-between text-sm text-gray-600">
+                    <span>Pajak (10%)</span>
+                    <span id="cartTax" class="font-semibold">Rp 0</span>
+                </div>
+                <div class="flex justify-between text-base font-black border-t pt-2 text-sageDark">
+                    <span>Total Pembayaran</span>
+                    <span id="cartTotal">Rp 0</span>
+                </div>
+                <button onclick="proceedToCheckout()" id="checkoutBtn" class="w-full bg-sage hover:bg-sageDark text-white font-bold py-3.5 rounded-xl transition shadow-md disabled:opacity-50" disabled>Lanjutkan ke Pembayaran & WhatsApp</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PEMBAYARAN ONLINE (DEBIT / QRIS) -->
+    <div id="checkoutModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
+        <div class="bg-white w-full max-w-lg p-7 rounded-3xl shadow-2xl space-y-5 text-center relative my-8">
+            <button onclick="closeCheckoutModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            
+            <div>
+                <span class="bg-sage/20 text-sageDark text-xs font-bold px-3.5 py-1 rounded-full uppercase">Form Pemesanan & Pembayaran Online</span>
+                <h3 class="text-2xl font-black text-sageDark mt-1 font-serif">Selesaikan Pesanan Online</h3>
+                <p class="text-xs text-gray-500 mt-0.5">Metode Pembayaran: Debit / QRIS / Transfer Bank (082230074366)</p>
+            </div>
+
+            <div class="bg-cream p-4 rounded-2xl border-2 border-dashed border-sage/60 flex flex-col items-center justify-center space-y-2">
+                <div class="bg-white p-3 rounded-xl shadow-sm">
+                    <i class="fa-solid fa-qrcode text-5xl text-sageDark"></i>
+                </div>
+                <p class="text-xs font-bold text-gray-700">Scan QRIS / Debit Virtual Account</p>
+                <p class="text-[11px] text-gray-500">No. Rek / VA: <span class="font-mono font-bold text-sageDark">8877-0822-3007-4366</span></p>
+            </div>
+
+            <div class="text-left space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1">Nama Pemesan / Pembeli Online *</label>
+                    <input type="text" id="buyerName" placeholder="Contoh: Kak Anggieta" class="w-full border rounded-xl p-2.5 bg-cream">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-gray-700 mb-1">No. WhatsApp *</label>
+                        <input type="text" id="buyerPhone" placeholder="08123456789" class="w-full border rounded-xl p-2.5 bg-cream">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-gray-700 mb-1">Metode Bayar Online *</label>
+                        <select id="onlinePayMethod" class="w-full border rounded-xl p-2.5 bg-cream font-bold">
+                            <option value="Debit / QRIS / Transfer">Debit / QRIS / Transfer</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-gray-700 mb-1">Tgl Pengambilan/Kirim *</label>
+                        <input type="date" id="deliveryDate" class="w-full border rounded-xl p-2.5 bg-cream">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-gray-700 mb-1">Upload Bukti Transfer/Debit</label>
+                        <input type="file" id="transferProof" accept="image/*" class="w-full border rounded-xl p-2 bg-cream text-gray-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1">Alamat Pengiriman / Catatan Lokasi</label>
+                    <textarea id="deliveryAddress" rows="2" placeholder="Tuliskan alamat lengkap pengiriman atau catatan lokasi" class="w-full border rounded-xl p-2.5 bg-cream"></textarea>
+                </div>
+            </div>
+
+            <button onclick="finishOrderAndRedirect()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-2xl transition shadow-lg flex items-center justify-center space-x-2 text-sm">
+                <i class="fa-brands fa-whatsapp text-lg"></i>
+                <span>Konfirmasi & Kirim ke WhatsApp (082230074366)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL CETAK NOTA KASIR -->
+    <div id="receiptModal" class="fixed inset-0 bg-black/70 z-[120] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-sm p-6 rounded-3xl shadow-2xl space-y-4 relative">
+            <button onclick="closeReceiptModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div id="receiptPrintArea" class="space-y-3 text-center text-xs font-mono">
+                <h2 class="text-base font-extrabold text-sageDark uppercase font-serif">BAKERYKU BY TATA</h2>
+                <p class="text-[10px] text-gray-500">Artisanal Bakery & Boutique</p>
+                <div class="border-t border-b border-dashed py-2 text-left space-y-1">
+                    <p>No: <span id="recNo">POS-12345</span></p>
+                    <p>Tgl: <span id="recDate">2026-10-21</span></p>
+                    <p>Kasir: <span id="recCashier">Visha</span></p>
+                    <p>Pembeli: <span id="recBuyer">Kak Budi</span></p>
+                </div>
+                <div id="recItemsList" class="text-left space-y-1 py-1"></div>
+                <div class="border-t border-dashed pt-2 text-right space-y-1 font-bold">
+                    <p>Subtotal: <span id="recSubtotal">Rp 0</span></p>
+                    <p>Pajak 10%: <span id="recTax">Rp 0</span></p>
+                    <p class="text-sm">TOTAL TAGIHAN: <span id="recTotal">Rp 0</span></p>
+                    <div id="recCashDetails" class="border-t border-dashed pt-1 text-gray-700">
+                        <p>Bayar (Tunai): <span id="recCashPaid">Rp 0</span></p>
+                        <p>Kembalian: <span id="recCashChange">Rp 0</span></p>
+                    </div>
+                </div>
+                <p class="text-[10px] text-gray-400 pt-2 border-t border-dashed">-- Terimakasih Atas Kunjungan Anda --</p>
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button onclick="window.print()" class="w-full bg-sage hover:bg-sageDark text-white py-2.5 rounded-xl font-bold text-xs"><i class="fa-solid fa-print mr-1"></i> Cetak Struk</button>
+                <button onclick="closeReceiptModal()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 py-2.5 rounded-xl font-bold text-xs">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TERIMAKASIH -->
+    <div id="thankYouModal" class="fixed inset-0 bg-black/90 z-[100] hidden flex items-center justify-center p-6 backdrop-blur-md">
+        <div class="text-center space-y-6 max-w-lg text-white">
+            <div class="w-24 h-24 bg-sage text-white rounded-full flex items-center justify-center text-4xl mx-auto shadow-2xl animate-bounce">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black font-serif tracking-wide">Terimakasih & Selamat Datang Kembali</h1>
+            <p class="text-gray-300 text-base font-light">Pesanan online Anda telah dicatat dengan status <strong>"Sedang Di Proses"</strong>.</p>
+            <button onclick="closeThankYouAndReset()" class="bg-sage hover:bg-sageDark text-white font-bold px-8 py-3.5 rounded-full shadow-xl transition">
+                Kembali ke Beranda Utama
+            </button>
+        </div>
+    </div>
+
+    <!-- LOGIKA JAVASCRIPT LENGKAP -->
+    <script>
+        const initialProducts = [
+            { id: 101, name: 'Paket Sage Morning (Croissant + Latte)', category: 'paket', price: 65000, discountPrice: 55000, stock: 15, mfgDate: '2026-10-05', expDate: '2026-11-20', image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80', tag: 'bestseller' },
+            { id: 102, name: 'Paket Sweet Afternoon (Slice Cake + Tea)', category: 'paket', price: 75000, discountPrice: 62000, stock: 12, mfgDate: '2026-10-05', expDate: '2026-11-20', image: 'https://images.unsplash.com/photo-1535141192574-5d4897c13136?auto=format&fit=crop&w=600&q=80', tag: 'recommended' },
+            { id: 103, name: 'Paket Couple High Tea (2 Pastry + 2 Drink)', category: 'paket', price: 130000, discountPrice: 105000, stock: 10, mfgDate: '2026-10-05', expDate: '2026-11-20', image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80', tag: 'bestseller' },
+            { id: 104, name: 'Paket Brunch Royale (Quiche + Mocktail)', category: 'paket', price: 70000, discountPrice: 58000, stock: 8, mfgDate: '2026-10-05', expDate: '2026-11-20', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80', tag: 'normal' },
+            { id: 1, name: 'Pistachio Bronte Croissant', category: 'roti', price: 38000, discountPrice: null, stock: 25, mfgDate: '2026-10-05', expDate: '2026-11-15', image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80', tag: 'bestseller' },
+            { id: 2, name: 'Birthday Cake Sage Green Edition', category: 'kue', price: 320000, discountPrice: 290000, stock: 10, mfgDate: '2026-10-05', expDate: '2026-11-30', image: 'https://images.unsplash.com/photo-1535141192574-5d4897c13136?auto=format&fit=crop&w=600&q=80', tag: 'bestseller' },
+            { id: 3, name: 'Iced Pistachio Latte', category: 'minuman', price: 38000, discountPrice: null, stock: 30, mfgDate: '2026-10-05', expDate: '2026-11-10', image: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=600&q=80', tag: 'bestseller' },
+            { id: 4, name: 'Choco Fudge Tower Cake', category: 'kue', price: 380000, discountPrice: null, stock: 8, mfgDate: '2026-10-05', expDate: '2026-11-25', image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=600&q=80', tag: 'bestseller' }
+        ];
+
+        let products = JSON.parse(localStorage.getItem('bakery_products')) || initialProducts;
+        let orders = JSON.parse(localStorage.getItem('bakery_orders')) || [];
+        let cart = [];
+        let cashierCart = [];
+        let currentCategoryFilter = 'all';
+        let appliedDiscountPercent = 0;
+        
+        let salesChartInstance = null;
+        let profitChartInstance = null;
+        let stockChartInstance = null;
+
+        let testimonials = [
+            { name: "Siti Rahma", comment: "Tampilan beranda dan katalognya sangat cantik bernuansa sage green!", date: "21 Okt 2026", rating: 5 },
+            { name: "Budi Santoso", comment: "Sangat suka transparansi status pesanan online yang 'Sedang Di Proses'!", date: "21 Okt 2026", rating: 5 }
+        ];
+
+        function isExpired(expDateStr) {
+            if(!expDateStr) return false;
+            const exp = new Date(expDateStr);
+            const now = new Date();
+            now.setHours(0,0,0,0);
+            return exp < now;
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const bgClass = type === 'success' ? 'bg-sageDark text-white' : 'bg-rose-600 text-white';
+            toast.className = `${bgClass} px-4 py-3 rounded-2xl shadow-2xl flex items-center space-x-2 text-xs font-bold transition transform translate-y-5 opacity-0 duration-300 pointer-events-auto`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('translate-y-5', 'opacity-0'); }, 10);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-5');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function saveData() {
+            localStorage.setItem('bakery_products', JSON.stringify(products));
+            localStorage.setItem('bakery_orders', JSON.stringify(orders));
+        }
+
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.hero-slide');
+        setInterval(() => {
+            if(slides.length > 0 && slides[currentSlide]) {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }
+        }, 5000);
+
+        function showSection(sectionId) {
+            ['home', 'catalog', 'custom', 'buyer-dashboard', 'testimonials', 'cashier', 'admin'].forEach(id => {
+                const el = document.getElementById(`section-${id}`);
+                if(el) el.classList.add('hidden');
+            });
+
+            if(sectionId === 'home') {
+                document.getElementById('section-home').classList.remove('hidden');
+            } else {
+                const target = document.getElementById(`section-${sectionId}`);
+                if(target) target.classList.remove('hidden');
+            }
+
+            if(sectionId === 'catalog') renderCatalog(currentCategoryFilter);
+            if(sectionId === 'buyer-dashboard') updateBuyerDashboard();
+            if(sectionId === 'testimonials') renderTestimonials();
+            if(sectionId === 'cashier') {
+                renderPOSProducts();
+                updateCashierTransactionsList();
+            }
+            if(sectionId === 'admin' && !document.getElementById('adminPanel').classList.contains('hidden')) {
+                updateAdminDashboard();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderTestimonials() {
+            const list = document.getElementById('testimonialList');
+            if(!list) return;
+            list.innerHTML = '';
+            testimonials.forEach(t => {
+                list.innerHTML += `
+                    <div class="glass-card p-6 rounded-2xl shadow-md border border-sage/30 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-gray-800 font-serif">${t.name}</h4>
+                            <span class="text-amber-400 text-sm">★★★★★</span>
+                        </div>
+                        <p class="text-gray-600 text-sm">"${t.comment}"</p>
+                        <p class="text-xs text-gray-400">${t.date}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function renderCatalog(category) {
+            currentCategoryFilter = category;
+            const grid = document.getElementById('catalogGrid');
+            if(!grid) return;
+            grid.innerHTML = '';
+            
+            const keyword = document.getElementById('catalogSearch') ? document.getElementById('catalogSearch').value.toLowerCase() : '';
+            const priceVal = document.getElementById('priceFilter') ? document.getElementById('priceFilter').value : 'all';
+
+            let filtered = products.filter(p => p.name.toLowerCase().includes(keyword));
+
+            if(category === 'bestseller') {
+                filtered = filtered.filter(p => p.tag === 'bestseller');
+            } else if(category === 'diskon') {
+                filtered = filtered.filter(p => p.discountPrice && p.discountPrice > 0);
+            } else if(category === 'paket') {
+                filtered = filtered.filter(p => p.category === 'paket');
+            } else if(category !== 'all') {
+                filtered = filtered.filter(p => p.category === category);
+            }
+
+            filtered = filtered.filter(p => {
+                const effectivePrice = (p.discountPrice && p.discountPrice > 0) ? p.discountPrice : p.price;
+                if(priceVal === 'under50') return effectivePrice < 50000;
+                if(priceVal === '50to150') return effectivePrice >= 50000 && effectivePrice <= 150000;
+                if(priceVal === 'above150') return effectivePrice > 150000;
+                return true;
+            });
+
+            filtered.forEach(p => {
+                let badgeHTML = '';
+                if(p.category === 'paket') {
+                    badgeHTML = `<span class="absolute top-3 left-3 bg-rose-500 text-white text-[10px] uppercase font-extrabold px-3 py-1 rounded-full shadow"><i class="fa-solid fa-box-open mr-1"></i> Paket Bundling</span>`;
+                } else if(p.tag === 'bestseller') {
+                    badgeHTML = `<span class="absolute top-3 left-3 bg-amber-500 text-white text-[10px] uppercase font-extrabold px-3 py-1 rounded-full shadow"><i class="fa-solid fa-fire mr-1"></i> Best Seller</span>`;
+                } else {
+                    let catName = p.category === 'roti' ? 'Roti' : (p.category === 'kue' ? 'Kue' : 'Minuman');
+                    badgeHTML = `<span class="absolute top-3 left-3 bg-sage text-white text-[10px] uppercase font-extrabold px-3 py-1 rounded-full shadow">${catName}</span>`;
+                }
+
+                let priceHTML = '';
+                if(p.discountPrice && p.discountPrice > 0) {
+                    priceHTML = `
+                        <div class="flex items-center space-x-2 mt-1">
+                            <span class="text-sageDark font-extrabold text-base font-serif">Rp ${parseInt(p.discountPrice).toLocaleString('id-ID')}</span>
+                            <span class="text-gray-400 text-xs line-through">Rp ${parseInt(p.price).toLocaleString('id-ID')}</span>
+                        </div>
+                    `;
+                } else {
+                    priceHTML = `<p class="text-sageDark font-extrabold text-base font-serif mt-1">Rp ${parseInt(p.price).toLocaleString('id-ID')}</p>`;
+                }
+
+                const expired = isExpired(p.expDate);
+                let btnHTML = expired 
+                    ? `<button disabled class="w-full bg-gray-300 text-gray-500 font-bold py-2.5 rounded-xl text-sm cursor-not-allowed">Produk Kedaluwarsa</button>`
+                    : `<button onclick="addToOnlineCart(${p.id})" class="w-full bg-gradient-to-r from-sage/20 to-sageDark/20 hover:from-sage hover:to-sageDark text-sageDark hover:text-white font-bold py-2.5 rounded-xl transition text-sm shadow-sm">Tambah ke Keranjang</button>`;
+
+                grid.innerHTML += `
+                    <div class="bg-white/95 rounded-3xl shadow-lg border border-sage/20 overflow-hidden flex flex-col justify-between group transform hover:-translate-y-1 transition duration-300">
+                        <div class="h-48 overflow-hidden relative bg-cream">
+                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            ${badgeHTML}
+                        </div>
+                        <div class="p-5 flex flex-col justify-between flex-grow space-y-3">
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-sm mt-1 line-clamp-2">${p.name}</h3>
+                                ${priceHTML}
+                                <div class="mt-2 text-[11px] bg-cream p-2.5 rounded-xl text-gray-600 space-y-0.5 border border-sage/20 shadow-inner">
+                                    <p>📅 Prod: <span class="font-semibold">${p.mfgDate || '2026-10-05'}</span></p>
+                                    <p class="${expired ? 'text-red-600 font-bold' : 'text-rose-600 font-semibold'}">⏳ Exp: <span>${p.expDate || '2026-11-20'}</span> ${expired ? '(Kedaluwarsa)' : ''}</p>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2">Stok: <span class="font-bold text-gray-700">${p.stock}</span> pcs</p>
+                            </div>
+                            ${btnHTML}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function filterCatalog(cat) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-sage', 'text-white', 'bg-rose-500', 'bg-amber-500', 'bg-purple-600');
+                btn.classList.add('bg-white', 'text-gray-700');
+            });
+            event.target.classList.remove('bg-white', 'text-gray-700');
+            if(cat === 'paket') event.target.classList.add('bg-rose-500', 'text-white');
+            else if(cat === 'bestseller') event.target.classList.add('bg-amber-500', 'text-white');
+            else if(cat === 'diskon') event.target.classList.add('bg-purple-600', 'text-white');
+            else event.target.classList.add('bg-sage', 'text-white');
+
+            renderCatalog(cat);
+        }
+
+        function updateCustomCake() {
+            const styleImg = document.getElementById('customStyleImg').value;
+            const sizeEl = document.getElementById('customSize');
+            const flavorEl = document.getElementById('customFlavor');
+            const colorEl = document.getElementById('customColor').value;
+            const noteEl = document.getElementById('customNote').value;
+            const payType = document.getElementById('customPayType').value;
+
+            const total = parseInt(sizeEl.value) + parseInt(flavorEl.value);
+            document.getElementById('previewImgTag').src = styleImg;
+            document.getElementById('cakeColorOverlay').style.backgroundColor = colorEl;
+            document.getElementById('previewTextTag').innerText = noteEl || 'Happy Birthday Tata';
+            document.getElementById('previewPrice').innerText = `Total Harga: Rp ${total.toLocaleString('id-ID')}`;
+
+            if(payType === 'dp') {
+                const dpVal = total * 0.5;
+                document.getElementById('previewPayNotice').innerText = `Estimasi Tagihan DP (50%): Rp ${dpVal.toLocaleString('id-ID')} (Sisa Rp ${dpVal.toLocaleString('id-ID')})`;
+            } else {
+                document.getElementById('previewPayNotice').innerText = `Bayar Lunas (100%): Rp ${total.toLocaleString('id-ID')}`;
+            }
+        }
+        if(document.getElementById('customNote')) {
+            document.getElementById('customNote').addEventListener('input', updateCustomCake);
+        }
+
+        function addCustomToCart() {
+            const sizeEl = document.getElementById('customSize');
+            const flavorEl = document.getElementById('customFlavor');
+            const styleImg = document.getElementById('customStyleImg').value;
+            const note = document.getElementById('customNote').value;
+            const eventDateStr = document.getElementById('customEventDate').value;
+            const payMethod = document.getElementById('customPayMethod').value;
+            const payType = document.getElementById('customPayType').value;
+
+            if(!eventDateStr) {
+                showToast('Harap tentukan Tanggal Acara/Ambil kue kustom!', 'error');
+                return;
+            }
+
+            const eventDate = new Date(eventDateStr);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const diffDays = Math.ceil((eventDate - today) / (1000 * 60 * 60 * 24));
+
+            if(diffDays < 7) {
+                showToast(`Pemesanan kustom minimal H-7! (${diffDays} hari lagi terpilih).`, 'error');
+                return;
+            }
+
+            const totalFullPrice = parseInt(sizeEl.value) + parseInt(flavorEl.value);
+            const isDP = payType === 'dp';
+            const chargedPrice = isDP ? (totalFullPrice * 0.5) : totalFullPrice;
+
+            const customItem = {
+                id: 'custom-' + Date.now(),
+                isCustomCake: true,
+                name: `Kustom Kue [Ambil: ${eventDateStr}] - (${payMethod}, ${isDP ? 'DP 50%' : 'Lunas'})`,
+                fullPrice: totalFullPrice,
+                price: chargedPrice,
+                qty: 1,
+                mfgDate: 'Hari Ini',
+                expDate: eventDateStr,
+                image: styleImg
+            };
+
+            cart.push(customItem);
+            updateCartUI();
+            toggleCart();
+            showToast('Kue kustom berhasil masuk keranjang!');
+        }
+
+        function addToOnlineCart(productId) {
+            const prod = products.find(p => p.id == productId);
+            if(prod.stock <= 0) { showToast('Stok produk habis!', 'error'); return; }
+            if(isExpired(prod.expDate)) { showToast('Produk kedaluwarsa!', 'error'); return; }
+
+            const finalPrice = (prod.discountPrice && prod.discountPrice > 0) ? prod.discountPrice : prod.price;
+            const existing = cart.find(item => item.id == productId);
+            if(existing) {
+                if(existing.qty >= prod.stock) { showToast('Melebihi sisa stok!', 'error'); return; }
+                existing.qty++;
+            } else {
+                cart.push({ ...prod, price: finalPrice, qty: 1 });
+            }
+            updateCartUI();
+            toggleCart();
+            showToast(`${prod.name} berhasil ditambah!`);
+        }
+
+        function toggleCart() {
+            document.getElementById('cartDrawer').classList.toggle('hidden');
+        }
+
+        function applyPromoCode() {
+            const code = document.getElementById('promoCodeInput').value.trim().toUpperCase();
+            if(code === 'TATA10') {
+                appliedDiscountPercent = 10;
+                document.getElementById('promoMessage').innerText = 'Kupon TATA10 berhasil dipakai! Diskon 10%.';
+                document.getElementById('promoMessage').className = 'text-[10px] text-emerald-600 font-bold';
+                showToast('Kupon TATA10 Berhasil Diaktifkan!');
+            } else {
+                appliedDiscountPercent = 0;
+                document.getElementById('promoMessage').innerText = 'Kode kupon tidak valid.';
+                document.getElementById('promoMessage').className = 'text-[10px] text-rose-600 font-bold';
+                showToast('Kode Kupon Tidak Valid', 'error');
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const list = document.getElementById('cartItemsList');
+            const countEl = document.getElementById('cartCount');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            list.innerHTML = '';
+            let totalQty = 0, subtotal = 0;
+
+            if(cart.length === 0) {
+                list.innerHTML = '<p class="text-gray-400 text-sm">Keranjang Anda masih kosong.</p>';
+                checkoutBtn.disabled = true;
+            } else {
+                checkoutBtn.disabled = false;
+                cart.forEach((item, index) => {
+                    totalQty += item.qty;
+                    subtotal += item.price * item.qty;
+                    list.innerHTML += `
+                        <div class="flex items-center justify-between bg-cream p-3 rounded-xl text-sm gap-3 border border-sage/20">
+                            <img src="${item.image}" class="w-12 h-12 object-cover rounded-lg">
+                            <div class="flex-grow">
+                                <p class="font-bold text-gray-800 leading-tight">${item.name}</p>
+                                <p class="text-xs text-gray-500">Rp ${parseInt(item.price).toLocaleString('id-ID')} x ${item.qty}</p>
+                            </div>
+                            <button onclick="removeFromCart(${index})" class="text-red-500 text-xs px-2"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    `;
+                });
+            }
+
+            const discountAmount = subtotal * (appliedDiscountPercent / 100);
+            const subtotalAfterDiscount = subtotal - discountAmount;
+            const tax = subtotalAfterDiscount * 0.10;
+            const total = subtotalAfterDiscount + tax;
+
+            countEl.innerText = totalQty;
+            document.getElementById('cartSubtotal').innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
+
+            if(appliedDiscountPercent > 0) {
+                document.getElementById('cartDiscountRow').classList.remove('hidden');
+                document.getElementById('cartDiscount').innerText = `- Rp ${discountAmount.toLocaleString('id-ID')}`;
+            } else {
+                document.getElementById('cartDiscountRow').classList.add('hidden');
+            }
+
+            document.getElementById('cartTax').innerText = `Rp ${tax.toLocaleString('id-ID')}`;
+            document.getElementById('cartTotal').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function proceedToCheckout() {
+            toggleCart();
+            document.getElementById('checkoutModal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.add('hidden');
+        }
+
+        // FUNGSI CHECKOUT ONLINE: SELALU BERSTATUS "Sedang Di Proses"
+        function finishOrderAndRedirect() {
+            const buyerName = document.getElementById('buyerName').value || 'Pelanggan Online';
+            const buyerPhone = document.getElementById('buyerPhone').value || '-';
+            const deliveryDate = document.getElementById('deliveryDate').value || 'Hari Ini';
+            const deliveryAddress = document.getElementById('deliveryAddress').value || 'Pengiriman Online';
+            const onlineMethod = document.getElementById('onlinePayMethod').value || 'Debit / QRIS / Transfer';
+            
+            let subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            let discountAmount = subtotal * (appliedDiscountPercent / 100);
+            let subAfterDisc = subtotal - discountAmount;
+            let tax = subAfterDisc * 0.10;
+            let grandTotal = subAfterDisc + tax;
+
+            cart.forEach(item => {
+                if(!item.isCustomCake) {
+                    let p = products.find(prod => prod.id == item.id);
+                    if(p) p.stock -= item.qty;
+                }
+            });
+
+            const finalOrderStatus = 'Sedang Di Proses';
+
+            const newOrder = {
+                id: 'TRX-' + Date.now().toString().slice(-6),
+                buyer: buyerName + ' (Online)',
+                phone: buyerPhone,
+                deliveryDate: deliveryDate,
+                address: deliveryAddress,
+                items: [...cart],
+                subtotal: subtotal,
+                discount: discountAmount,
+                tax: tax,
+                total: grandTotal,
+                paymentMethod: onlineMethod,
+                status: finalOrderStatus,
+                date_time: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
+            };
+            orders.unshift(newOrder);
+            saveData();
+
+            let details = cart.map(i => `- ${i.name} (${i.qty}x)`).join('\n');
+            let message = `Halo Owner Bakeryku By Tata,%0A%0ASaya *${buyerName}* (${buyerPhone}) memesan online via ${onlineMethod}:%0A${encodeURIComponent(details)}%0A%0A*Total Bayar: Rp ${grandTotal.toLocaleString('id-ID')}*%0A*Status Pesanan:* ${finalOrderStatus}%0A*Tgl Pengambilan/Kirim:* ${deliveryDate}%0A*Alamat/Catatan:* ${deliveryAddress}`;
+            window.open(`https://wa.me/6282230074366?text=${message}`, '_blank');
+
+            cart = [];
+            appliedDiscountPercent = 0;
+            updateCartUI();
+            closeCheckoutModal();
+            document.getElementById('thankYouModal').classList.remove('hidden');
+        }
+
+        function updateBuyerDashboard() {
+            const searchKeyword = document.getElementById('buyerSearchInput') ? document.getElementById('buyerSearchInput').value.toLowerCase() : '';
+            let filteredOrders = orders.filter(o => o.buyer.toLowerCase().includes(searchKeyword) || o.id.toLowerCase().includes(searchKeyword));
+
+            document.getElementById('buyerTotalOrders').innerText = filteredOrders.length;
+            let totalSpent = filteredOrders.reduce((sum, o) => sum + o.total, 0);
+            document.getElementById('buyerTotalSpent').innerText = `Rp ${totalSpent.toLocaleString('id-ID')}`;
+
+            const list = document.getElementById('buyerOrdersList');
+            if(!list) return;
+            list.innerHTML = '';
+
+            if(filteredOrders.length === 0) {
+                list.innerHTML = '<p class="text-gray-500 text-sm italic">Belum ada riwayat pembelian sesuai kriteria pencarian.</p>';
+                return;
+            }
+
+            filteredOrders.forEach(o => {
+                let itemsHtml = o.items.map(i => `<li class="text-xs text-gray-700 font-medium">• ${i.name} (${i.qty}x) - Rp ${(i.price * i.qty).toLocaleString('id-ID')}</li>`).join('');
+                let isProcessing = o.status.includes('Proses') || o.status.includes('proses');
+                let statusBadge = isProcessing ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-300';
+
+                list.innerHTML += `
+                    <div class="bg-white p-5 rounded-2xl border border-sage/30 space-y-3 shadow-sm">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 gap-2 border-sage/20">
+                            <div>
+                                <span class="bg-sage text-white text-[10px] px-2.5 py-1 rounded-full font-bold uppercase">${o.id}</span>
+                                <span class="text-xs text-gray-500 ml-2"><i class="fa-regular fa-calendar mr-1"></i> ${o.date_time}</span>
+                            </div>
+                            <span class="${statusBadge} text-xs px-3 py-1 rounded-full font-extrabold"><i class="fa-solid fa-clock-rotate-left mr-1"></i> ${o.status}</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-xs font-bold text-gray-700 mb-1">Daftar Item Dibeli:</p>
+                                <ul class="space-y-1">${itemsHtml}</ul>
+                                ${o.address ? `<p class="text-[11px] text-gray-500 mt-2"><strong>Alamat/Opsi:</strong> ${o.address}</p>` : ''}
+                            </div>
+                            <div class="bg-cream p-3 rounded-xl border border-sage/20 space-y-1 text-xs">
+                                <p class="font-bold text-sageDark mb-1 font-serif">Rincian Pembayaran:</p>
+                                <div class="flex justify-between text-gray-600"><span>Metode:</span> <span class="font-semibold">${o.paymentMethod || 'Debit / Transfer'}</span></div>
+                                <div class="flex justify-between font-black text-sm text-sageDark border-t border-sage/20 pt-1 mt-1 font-serif"><span>Total Bayar:</span> <span>Rp ${o.total.toLocaleString('id-ID')}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderPOSProducts() {
+            const grid = document.getElementById('posProductGrid');
+            if(!grid) return;
+            const keyword = document.getElementById('posSearch').value.toLowerCase();
+            grid.innerHTML = '';
+
+            products.filter(p => p.name.toLowerCase().includes(keyword)).forEach(p => {
+                const finalPrice = (p.discountPrice && p.discountPrice > 0) ? p.discountPrice : p.price;
+                const expired = isExpired(p.expDate);
+                grid.innerHTML += `
+                    <div onclick="${expired ? '' : `addPOSCart(${p.id})`}" class="bg-white p-3 rounded-xl border border-sage/30 ${expired ? 'opacity-50 cursor-not-allowed' : 'hover:border-sage cursor-pointer'} transition flex items-center space-x-3 shadow-sm">
+                        <img src="${p.image}" class="w-14 h-14 object-cover rounded-lg">
+                        <div class="flex-grow">
+                            <p class="font-bold text-gray-800 text-xs line-clamp-1">${p.name}</p>
+                            <p class="text-xs text-sageDark font-bold mt-0.5 font-serif">Rp ${parseInt(finalPrice).toLocaleString('id-ID')}</p>
+                            <p class="text-[10px] ${expired ? 'text-red-600 font-bold' : 'text-gray-500'}">Exp: ${p.expDate || '2026-11-20'} | Stok: ${p.stock}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addPOSCart(productId) {
+            const prod = products.find(p => p.id == productId);
+            if(prod.stock <= 0) { showToast('Stok produk habis!', 'error'); return; }
+            if(isExpired(prod.expDate)) { showToast('Produk kedaluwarsa!', 'error'); return; }
+
+            const finalPrice = (prod.discountPrice && prod.discountPrice > 0) ? prod.discountPrice : prod.price;
+            const existing = cashierCart.find(item => item.id == productId);
+            if(existing) {
+                if(existing.qty >= prod.stock) { showToast('Melebihi sisa stok!', 'error'); return; }
+                existing.qty++;
+            } else {
+                cashierCart.push({ ...prod, price: finalPrice, qty: 1 });
+            }
+            updatePOSCartUI();
+        }
+
+        function addPOSCustomCakeToCart() {
+            const style = document.getElementById('posCustomStyle').value;
+            const sizeEl = document.getElementById('posCustomSize');
+            const flavorEl = document.getElementById('posCustomFlavor');
+            const note = document.getElementById('posCustomNote').value;
+            const eventDateStr = document.getElementById('posCustomDate').value;
+            const posMethod = document.getElementById('posCustomMethod').value;
+            const payType = document.getElementById('posCustomPayType').value;
+
+            if(!eventDateStr) {
+                showToast('Harap tentukan Tanggal Ambil kue kustom!', 'error');
+                return;
+            }
+
+            const eventDate = new Date(eventDateStr);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const diffDays = Math.ceil((eventDate - today) / (1000 * 60 * 60 * 24));
+
+            if(diffDays < 7) {
+                showToast(`Pemesanan kustom minimal H-7 (${diffDays} hari lagi terpilih).`, 'error');
+                return;
+            }
+
+            const totalFullPrice = parseInt(sizeEl.value) + parseInt(flavorEl.value);
+            const isDP = payType === 'dp';
+            const chargedPrice = isDP ? (totalFullPrice * 0.5) : totalFullPrice;
+
+            const name = `Kustom Kasir [Ambil: ${eventDateStr}] - (${posMethod}, ${isDP ? 'DP 50%' : 'Lunas'}) ${note ? '"' + note + '"' : ''}`;
+
+            cashierCart.push({ id: 'pos-cust-' + Date.now(), isCustomCake: true, name, price: chargedPrice, qty: 1, image: 'https://images.unsplash.com/photo-1535141192574-5d4897c13136?auto=format&fit=crop&w=600&q=80' });
+            document.getElementById('posCustomNote').value = '';
+            updatePOSCartUI();
+            showToast('Kue kustom kasir berhasil dimasukkan!');
+        }
+
+        function toggleCashInput() {
+            const method = document.getElementById('posPaymentMethod').value;
+            const box = document.getElementById('cashInputBox');
+            if(method.includes('Tunai')) {
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+
+        function calculateChange() {
+            let subtotal = cashierCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            let tax = subtotal * 0.10;
+            let grandTotal = subtotal + tax;
+
+            let received = parseFloat(document.getElementById('posCashReceived').value) || 0;
+            let change = received - grandTotal;
+
+            if(change >= 0) {
+                document.getElementById('posChangeText').innerText = `Rp ${change.toLocaleString('id-ID')}`;
+                document.getElementById('posChangeText').className = "text-emerald-600 font-extrabold";
+            } else {
+                document.getElementById('posChangeText').innerText = `Kurang Rp ${Math.abs(change).toLocaleString('id-ID')}`;
+                document.getElementById('posChangeText').className = "text-rose-600 font-extrabold";
+            }
+        }
+
+        function setQuickCash(amount) {
+            let subtotal = cashierCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            let tax = subtotal * 0.10;
+            let grandTotal = subtotal + tax;
+
+            let finalAmount = amount === 0 ? grandTotal : amount;
+            document.getElementById('posCashReceived').value = finalAmount;
+            calculateChange();
+        }
+
+        function updatePOSCartUI() {
+            const list = document.getElementById('posCartItems');
+            const checkoutBtn = document.getElementById('posCheckoutBtn');
+            list.innerHTML = '';
+            let subtotal = 0;
+
+            if(cashierCart.length === 0) {
+                list.innerHTML = '<p class="text-gray-400 text-sm">Belum ada item dipilih.</p>';
+                checkoutBtn.disabled = true;
+            } else {
+                checkoutBtn.disabled = false;
+                cashierCart.forEach((item, idx) => {
+                    subtotal += item.price * item.qty;
+                    list.innerHTML += `
+                        <div class="flex justify-between items-center bg-cream p-2.5 rounded-xl text-xs gap-2 border border-sage/20">
+                            <div class="flex-grow">
+                                <p class="font-bold line-clamp-1">${item.name}</p>
+                                <p class="text-gray-500">Rp ${parseInt(item.price).toLocaleString('id-ID')} x ${item.qty}</p>
+                            </div>
+                            <button onclick="removePOSCart(${idx})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    `;
+                });
+            }
+
+            const tax = subtotal * 0.10;
+            document.getElementById('posSubtotal').innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
+            document.getElementById('posTax').innerText = `Rp ${tax.toLocaleString('id-ID')}`;
+            document.getElementById('posTotal').innerText = `Rp ${(subtotal + tax).toLocaleString('id-ID')}`;
+            calculateChange();
+        }
+
+        function removePOSCart(idx) {
+            cashierCart.splice(idx, 1);
+            updatePOSCartUI();
+        }
+
+        // FUNGSI TRANSAKSI KASIR (TETAP SAMA: Selesai / Lunas)
+        function finishCashierTransaction() {
+            const buyerName = document.getElementById('posBuyerName').value || 'Pelanggan Toko';
+            const method = document.getElementById('posPaymentMethod').value;
+            let subtotal = cashierCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            let tax = subtotal * 0.10;
+            let total = subtotal + tax;
+
+            let received = parseFloat(document.getElementById('posCashReceived').value) || total;
+            let change = received - total;
+
+            if(method.includes('Tunai') && received < total) {
+                showToast('Uang diterima kurang dari total pembayaran!', 'error');
+                return;
+            }
+
+            cashierCart.forEach(item => {
+                if(!item.isCustomCake) {
+                    let p = products.find(prod => prod.id == item.id);
+                    if(p) p.stock -= item.qty;
+                }
+            });
+
+            const trxId = 'POS-' + Date.now().toString().slice(-6);
+            const dateStr = new Date().toISOString().split('T')[0];
+            const orderStatus = `Selesai (${method})`;
+
+            const newOrder = {
+                id: trxId,
+                buyer: buyerName + ' (Kasir Visha)',
+                items: [...cashierCart],
+                subtotal: subtotal,
+                tax: tax,
+                total: total,
+                received: received,
+                change: change > 0 ? change : 0,
+                paymentMethod: method,
+                status: orderStatus,
+                date_time: dateStr
+            };
+            orders.unshift(newOrder);
+            saveData();
+
+            document.getElementById('recNo').innerText = trxId;
+            document.getElementById('recDate').innerText = dateStr;
+            document.getElementById('recBuyer').innerText = buyerName;
+            document.getElementById('recSubtotal').innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
+            document.getElementById('recTax').innerText = `Rp ${tax.toLocaleString('id-ID')}`;
+            document.getElementById('recTotal').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+
+            if(method.includes('Tunai')) {
+                document.getElementById('recCashDetails').classList.remove('hidden');
+                document.getElementById('recCashPaid').innerText = `Rp ${received.toLocaleString('id-ID')}`;
+                document.getElementById('recCashChange').innerText = `Rp ${(change > 0 ? change : 0).toLocaleString('id-ID')}`;
+            } else {
+                document.getElementById('recCashDetails').classList.add('hidden');
+            }
+
+            let recListHtml = cashierCart.map(i => `<div class="flex justify-between"><span>${i.name} x${i.qty}</span><span>Rp ${(i.price * i.qty).toLocaleString('id-ID')}</span></div>`).join('');
+            document.getElementById('recItemsList').innerHTML = recListHtml;
+
+            cashierCart = [];
+            document.getElementById('posBuyerName').value = '';
+            document.getElementById('posCashReceived').value = '';
+            updatePOSCartUI();
+            document.getElementById('receiptModal').classList.remove('hidden');
+        }
+
+        function closeReceiptModal() {
+            document.getElementById('receiptModal').classList.add('hidden');
+            document.getElementById('thankYouModal').classList.remove('hidden');
+        }
+
+        function updateCashierTransactionsList() {
+            const list = document.getElementById('cashierTransactionsList');
+            if(!list) return;
+            list.innerHTML = '';
+            if(orders.length === 0) {
+                list.innerHTML = '<p class="text-gray-400 text-sm">Belum ada transaksi.</p>';
+            } else {
+                orders.forEach(o => {
+                    let isProcessing = o.status.includes('Proses') || o.status.includes('proses');
+                    let statusBadge = isProcessing ? 'bg-amber-500' : 'bg-sage';
+                    list.innerHTML += `
+                        <div class="p-3 bg-white rounded-xl text-xs flex justify-between items-center border border-sage/20 shadow-sm">
+                            <div>
+                                <p class="font-bold text-gray-800">${o.buyer}</p>
+                                <p class="text-gray-500">Total: Rp ${parseInt(o.total).toLocaleString('id-ID')} | <span class="text-sageDark font-semibold">${o.status}</span></p>
+                            </div>
+                            <span class="${statusBadge} text-white text-[10px] px-2.5 py-1 rounded-full font-bold">${o.date_time}</span>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function loginAdmin() {
+            const u = document.getElementById('adminUser').value;
+            const p = document.getElementById('adminPass').value;
+            if(u.toLowerCase() === 'anggieta navisha' && p === '050609') {
+                document.getElementById('adminLoginBox').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+                updateAdminDashboard();
+                showToast('Selamat datang Admin Anggieta Navisha!');
+            } else {
+                showToast('Akses Ditolak! Username / Password Salah', 'error');
+            }
+        }
+
+        function logoutAdmin() {
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('adminLoginBox').classList.remove('hidden');
+            showToast('Berhasil keluar dari mode admin');
+        }
+
+        function exportSalesToCSV() {
+            if(orders.length === 0) {
+                showToast('Belum ada data transaksi untuk diexport!', 'error');
+                return;
+            }
+            let csvContent = "data:text/csv;charset=utf-8,ID Transaksi,Nama Pembeli,Tanggal,Subtotal,Pajak,Total Bayar,Metode,Status\n";
+            orders.forEach(o => {
+                csvContent += `"${o.id}","${o.buyer}","${o.date_time}","${o.subtotal || 0}","${o.tax || 0}","${o.total}","${o.paymentMethod || 'Debit / QRIS'}","${o.status}"\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Laporan_Penjualan_Bakeryku_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('Laporan transaksi berhasil di-download (.CSV)');
+        }
+
+        function updateAdminDashboard() {
+            document.getElementById('statTotalTrans').innerText = orders.length;
+            document.getElementById('statTotalProd').innerText = products.length;
+
+            let productSalesMap = {};
+            orders.forEach(o => {
+                if(o.items && Array.isArray(o.items)) {
+                    o.items.forEach(item => {
+                        let itemName = item.name.split(' - ')[0];
+                        let revenue = (item.price || 0) * (item.qty || 1);
+                        productSalesMap[itemName] = (productSalesMap[itemName] || 0) + revenue;
+                    });
+                }
+            });
+
+            let bestProdName = "Belum ada data";
+            let maxRevenue = 0;
+            for(let prod in productSalesMap) {
+                if(productSalesMap[prod] > maxRevenue) {
+                    maxRevenue = productSalesMap[prod];
+                    bestProdName = prod;
+                }
+            }
+            document.getElementById('statBestProduct').innerText = bestProdName !== "Belum ada data" ? `${bestProdName} (Rp ${maxRevenue.toLocaleString('id-ID')})` : "Belum ada data";
+
+            // RENDER KETIGA GRAFIK DI ADMIN DASHBOARD
+            renderAdminCharts(productSalesMap);
+
+            const prodList = document.getElementById('adminProductList');
+            prodList.innerHTML = '';
+            products.forEach((p) => {
+                let tagLabel = p.category === 'paket' ? '📦 Paket' : (p.tag === 'bestseller' ? '🔥 Best Seller' : 'Normal');
+                let priceText = p.discountPrice ? `Rp ${parseInt(p.discountPrice).toLocaleString('id-ID')} <span class="line-through text-gray-400">Rp ${parseInt(p.price).toLocaleString('id-ID')}</span>` : `Rp ${parseInt(p.price).toLocaleString('id-ID')}`;
+                let expired = isExpired(p.expDate);
+                prodList.innerHTML += `
+                    <div class="flex justify-between items-center bg-white p-3 rounded-xl text-sm gap-3 border border-sage/20 shadow-sm">
+                        <img src="${p.image}" class="w-10 h-10 object-cover rounded-lg">
+                        <div class="flex-grow">
+                            <p class="font-bold text-gray-800 line-clamp-1">${p.name} <span class="text-xs text-gray-500">(${tagLabel})</span></p>
+                            <p class="text-xs text-sageDark font-semibold">${priceText} | <span class="${expired ? 'text-red-600 font-bold' : 'text-rose-600 font-medium'}">Exp: ${p.expDate || '2026-11-20'}</span> | <span class="text-amber-600 font-extrabold">Stok: ${p.stock} pcs</span></p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="editProduct(${p.id})" class="text-blue-600 bg-white px-2.5 py-1 rounded-lg border text-xs font-bold shadow-sm">Edit</button>
+                            <button onclick="deleteProduct(${p.id})" class="text-red-600 bg-white px-2.5 py-1 rounded-lg border text-xs font-bold shadow-sm">Hapus</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const ordersList = document.getElementById('adminOrdersList');
+            ordersList.innerHTML = '';
+            if(orders.length === 0) {
+                ordersList.innerHTML = '<p class="text-gray-500 text-sm">Belum ada transaksi masuk.</p>';
+            } else {
+                orders.forEach(o => {
+                    let isProcessing = o.status.includes('Proses') || o.status.includes('proses');
+                    let statusBadge = isProcessing ? 'bg-amber-500' : 'bg-sage';
+                    ordersList.innerHTML += `
+                        <div class="p-3 bg-white rounded-xl text-sm flex justify-between items-center border border-sage/20 shadow-sm">
+                            <div>
+                                <p class="font-bold">Pembeli: ${o.buyer}</p>
+                                <p class="text-xs text-gray-500">Total: Rp ${parseInt(o.total).toLocaleString('id-ID')} (${o.date_time})</p>
+                            </div>
+                            <span class="${statusBadge} text-white text-xs px-3 py-1 rounded-full font-bold">${o.status}</span>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function renderAdminCharts(productSalesMap) {
+            // 1. Grafik Penjualan Bulanan (Omset)
+            const ctxSales = document.getElementById('salesChart');
+            if(ctxSales) {
+                let monthlyTotals = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                orders.forEach(o => {
+                    let dateObj = new Date();
+                    if(o.date_time && o.date_time.includes('-')) {
+                        dateObj = new Date(o.date_time);
+                    }
+                    let monthIdx = dateObj.getMonth();
+                    if(!isNaN(monthIdx)) {
+                        monthlyTotals[monthIdx] += (o.total || 0);
+                    }
+                });
+
+                if(salesChartInstance) salesChartInstance.destroy();
+                salesChartInstance = new Chart(ctxSales, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+                        datasets: [{
+                            label: 'Omset Bulanan (Rp)',
+                            data: monthlyTotals,
+                            backgroundColor: '#87A96B',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: function(value) { return 'Rp ' + value.toLocaleString('id-ID'); } }
+                            }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+
+            // 2. Grafik Profit Produk (Produk Paling Menguntungkan)
+            const ctxProfit = document.getElementById('profitChart');
+            if(ctxProfit) {
+                let sortedProducts = Object.keys(productSalesMap).sort((a,b) => productSalesMap[b] - productSalesMap[a]).slice(0, 5);
+                let sortedValues = sortedProducts.map(p => productSalesMap[p]);
+
+                if(profitChartInstance) profitChartInstance.destroy();
+                profitChartInstance = new Chart(ctxProfit, {
+                    type: 'doughnut',
+                    data: {
+                        labels: sortedProducts.length > 0 ? sortedProducts : ['Belum Ada Transaksi'],
+                        datasets: [{
+                            data: sortedValues.length > 0 ? sortedValues : [1],
+                            backgroundColor: ['#5F7A4C', '#87A96B', '#D4AF37', '#93C572', '#E8F3E0']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
+                        }
+                    }
+                });
+            }
+
+            // 3. Grafik Stok Produk
+            const ctxStock = document.getElementById('stockChart');
+            if(ctxStock) {
+                let productNames = products.map(p => p.name.length > 20 ? p.name.substring(0, 20) + '...' : p.name);
+                let productStocks = products.map(p => p.stock);
+
+                if(stockChartInstance) stockChartInstance.destroy();
+                stockChartInstance = new Chart(ctxStock, {
+                    type: 'bar',
+                    data: {
+                        labels: productNames,
+                        datasets: [{
+                            label: 'Sisa Stok (Pcs)',
+                            data: productStocks,
+                            backgroundColor: '#D4AF37',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, ticks: { precision: 0 } }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+        }
+
+        function saveProduct() {
+            const id = document.getElementById('editId').value;
+            const name = document.getElementById('prodName').value;
+            const category = document.getElementById('prodCategory').value;
+            const tag = document.getElementById('prodTag').value;
+            const mfgDate = document.getElementById('prodMfg').value || '2026-10-05';
+            const expDate = document.getElementById('prodExp').value || '2026-11-20';
+            const price = parseInt(document.getElementById('prodPrice').value);
+            const discountPrice = document.getElementById('prodDiscountPrice').value ? parseInt(document.getElementById('prodDiscountPrice').value) : null;
+            const stock = parseInt(document.getElementById('prodStock').value) || 20;
+            let image = document.getElementById('prodImage').value;
+
+            if(!name || isNaN(price)) { showToast('Nama dan harga wajib diisi!', 'error'); return; }
+            if(!image) {
+                image = category === 'paket' ? 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80' : 
+                        (category === 'roti' ? 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80' : 
+                        (category === 'kue' ? 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=600&q=80' : 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=600&q=80'));
+            }
+
+            if(id) {
+                let p = products.find(item => item.id == id);
+                if(p) {
+                    p.name = name;
+                    p.category = category;
+                    p.tag = tag;
+                    p.mfgDate = mfgDate;
+                    p.expDate = expDate;
+                    p.price = price;
+                    p.discountPrice = discountPrice;
+                    p.stock = stock;
+                    p.image = image;
+                }
+            } else {
+                const newProd = {
+                    id: Date.now(),
+                    name,
+                    category,
+                    price,
+                    discountPrice,
+                    stock,
+                    mfgDate,
+                    expDate,
+                    tag,
+                    image
+                };
+                products.unshift(newProd);
+            }
+
+            saveData();
+            showToast('Produk & Tanggal Exp berhasil disimpan!');
+            document.getElementById('editId').value = '';
+            document.getElementById('prodName').value = '';
+            document.getElementById('prodMfg').value = '';
+            document.getElementById('prodExp').value = '';
+            document.getElementById('prodPrice').value = '';
+            document.getElementById('prodDiscountPrice').value = '';
+            document.getElementById('prodStock').value = '20';
+            document.getElementById('prodImage').value = '';
+            document.getElementById('formTitle').innerText = 'Tambah Menu & Tanggal Exp Baru';
+            updateAdminDashboard();
+        }
+
+        function editProduct(id) {
+            const p = products.find(item => item.id == id);
+            if(p) {
+                document.getElementById('editId').value = p.id;
+                document.getElementById('prodName').value = p.name;
+                document.getElementById('prodCategory').value = p.category;
+                document.getElementById('prodTag').value = p.tag || 'normal';
+                document.getElementById('prodMfg').value = p.mfgDate || '';
+                document.getElementById('prodExp').value = p.expDate || '';
+                document.getElementById('prodPrice').value = p.price;
+                document.getElementById('prodDiscountPrice').value = p.discountPrice || '';
+                document.getElementById('prodStock').value = p.stock;
+                document.getElementById('prodImage').value = p.image;
+                document.getElementById('formTitle').innerText = 'Edit Produk & Tanggal Exp';
+            }
+        }
+
+        function deleteProduct(id) {
+            if(confirm('Yakin ingin menghapus produk ini?')) {
+                products = products.filter(item => item.id != id);
+                saveData();
+                updateAdminDashboard();
+                showToast('Produk berhasil dihapus');
+            }
+        }
+
+        function closeThankYouAndReset() {
+            document.getElementById('thankYouModal').classList.add('hidden');
+            showSection('home');
+        }
+
+        renderCatalog('all');
+        updateCustomCake();
+    </script>
+</body>
+</html>
